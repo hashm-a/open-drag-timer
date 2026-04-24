@@ -1,0 +1,12 @@
+$PCAS11,3*1E // Set Reciever Mode to Automotive
+
+
+
+
+
+
+$PCAS04,D*6D // GPS + GLONASS + GALILEO
+$PCAS04,9*10 // GPS + GALILEO
+
+$PCAS10,1*1D // Reboot Warm
+$PCAS02,100*1E // Set refresh 10hz
