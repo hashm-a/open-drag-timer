@@ -15,14 +15,14 @@ public:
     float end_speed;
 
     RollTarget() : start_speed(100), end_speed(200) {
-        name = std::string(std::to_string(static_cast<int>(start_speed)) + " - " + std::to_string(static_cast<int>(end_speed)));
+        name = std::string(std::to_string(static_cast<int>(start_speed)) + "-" + std::to_string(static_cast<int>(end_speed)));
     }
 
     RollTarget(const float start_speed, const float end_speed)
         : start_speed(start_speed),
           end_speed(end_speed) {
 
-        name = std::string(std::to_string(static_cast<int>(start_speed)) + " - " + std::to_string(static_cast<int>(end_speed)));
+        name = std::string(std::to_string(static_cast<int>(start_speed)) + "-" + std::to_string(static_cast<int>(end_speed)));
     }
 
     void UpdateRunData(AppState * app_state) override {

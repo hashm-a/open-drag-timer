@@ -27,6 +27,7 @@ enum RunMode {
 
 struct GPSData {
     double current_speed = 0;
+    float current_HDOP;
     uint32_t satellite_count = 0;
     Vector2 location{};
     int32_t altitude = 0;
@@ -37,7 +38,6 @@ struct GPSData {
 };
 
 class RunController;
-class AudioController;
 
 struct GlobalObjects {
     RunController * run_controller = nullptr;
@@ -54,6 +54,7 @@ struct AppState {
     GPSData gps;
     RunMode run_mode = DRAG;
     GlobalObjects global_objects;
+
     SettingsState settings_state = SELECTING_RUN_TYPE;
     Vector2 settings_roll_params{100,200};
 
@@ -65,14 +66,12 @@ struct AppState {
 
     void NextRunMode() {
         run_mode = static_cast<RunMode>(static_cast<int>(run_mode) + 1);
-        if (run_mode == RunMode::COUNT) {
+        if (run_mode == COUNT) {
             run_mode = static_cast<RunMode>(0);
         }
-
-        last_run_exists = false;
     }
 
-    void SetStage(Stage new_stage) {
+    void SetStage(const Stage new_stage) {
         switch (new_stage) {
             case GPS_WAIT:
                 this->stage = GPS_WAIT;
@@ -84,8 +83,11 @@ struct AppState {
                 this->stage = SETTINGS;
                 break;
             case VIEW_LAST_RUN:
-                if (!last_run_exists) {this->stage = WELCOME; break;}
-                this->stage = VIEW_LAST_RUN;
+                if (last_run_exists) {
+                    this->stage = VIEW_LAST_RUN;
+                } else {
+                    this->stage = WELCOME;
+                }
                 break;
             case WAITING_FOR_STAGING:
                 this->stage = WAITING_FOR_STAGING;

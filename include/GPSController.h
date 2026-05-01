@@ -17,9 +17,11 @@ public:
 
     void Update();
 
-    void updateSats();
-
 private:
+    void updateHDOP();
+
+    void updateSatellites();
+
     void updateSpeed();
 
     void updateLocation();

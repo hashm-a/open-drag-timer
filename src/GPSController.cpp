@@ -32,12 +32,20 @@ GPSController::GPSController(AppState * app_state_ptr,
 
 void GPSController::Update() {
     gps_interface.updateGPS();
-    updateSats();
+    updateSatellites();
     updateSpeed();
     updateLocation();
+    updateAltitude();
+    updateHDOP();
 }
 
-void GPSController::updateSats() {
+void GPSController::updateHDOP() {
+    if (gps_interface.hdop.isValid()) {
+        app_state->gps.current_HDOP = gps_interface.hdop.hdop();
+    }
+}
+
+void GPSController::updateSatellites() {
     if (gps_interface.satellites.isValid()) {
         app_state->gps.satellite_count = gps_interface.satellites.value();
     }

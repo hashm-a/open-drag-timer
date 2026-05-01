@@ -1,22 +1,21 @@
 //
 // Created by Hashm A on 2026-04-19.
 //
+#include "state.h"
 
 #include "ViewController.h"
-
-// #include <M5StickCPlus2.h>
-#include <M5Unified.h>
-#include <state.h>
-
 #include "RunController.h"
 
+#include <M5Unified.h>
+
 ViewController::ViewController(AppState * app_state_ptr) : app_state(app_state_ptr) {
-    M5.Display.setRotation(3); // Landscape - Main button the left
-    M5.Display.setTextDatum(middle_center);
+    display_buffer.createSprite(M5.Lcd.width(), M5.Lcd.height());
+    display_buffer.setRotation(3); // Landscape - Main button the left
+    display_buffer.setTextDatum(middle_center);
 }
 
 void ViewController::Draw() {
-    M5.Display.clear();
+    display_buffer.clear();
 
     switch (app_state->stage) {
         case GPS_WAIT:
@@ -48,241 +47,210 @@ void ViewController::Draw() {
         drawBackStage();
         displaysSatelliteCount();
     }
+
+    display_buffer.pushSprite(&M5.Lcd, 0,0);
 }
 
 void ViewController::displaySettings() {
-    M5.Display.setTextColor(WHITE);
+    display_buffer.setTextColor(WHITE);
     switch (app_state->settings_state) {
-        case SELECTING_RUN_TYPE:
-            M5.Display.setTextSize(5);
-            M5.Display.setCursor(40, M5.Display.height() / 2);
+
+        case SELECTING_RUN_TYPE: {
+            display_buffer.setTextSize(5);
+            display_buffer.setCursor(60, display_buffer.height() / 2);
             switch (app_state->run_mode) {
                 case DRAG:
-                    M5.Display.printf("DRAG");
+                    display_buffer.printf("DRAG");
                     break;
                 case ROLL:
-                    M5.Display.printf("ROLL");
+                    display_buffer.printf("ROLL");
                     break;
                 default:
                     break;
             }
             break;
-        case MODIFYING_ROLL_START:
-            M5.Display.setCursor(20, M5.Display.height() / 2);
-            M5.Display.setTextSize(3);
-            M5.Display.printf("Start: %0.0f", app_state->settings_roll_params.x);
-            break;
-        case MODIFYING_ROLL_END:
-            M5.Display.setCursor(20, M5.Display.height() / 2);
-            M5.Display.setTextSize(3);
-            M5.Display.printf("End: %0.0f", app_state->settings_roll_params.y);
-            break;
-    }
-}
-
-void ViewController::displayRollLastRun() {
-    M5.Display.setCursor(12, 20);
-    M5.Display.setTextSize(1.5);
-    M5.Display.setTextColor(WHITE);
-    M5.Display.printf("Last Run:\r\n");
-    M5.Display.setCursor(12, 35);
-
-    auto roll_runs = app_state->global_objects.run_controller->GetRollRuns();
-
-    for (auto & run : roll_runs) {
-        if (!run.is_completed) {continue;}
-        if (GetSlope(run.starting_altitude, run.ending_altitude, run.starting_position, run.ending_position) < BAD_SLOPE_PERCENT) {
-            M5.Display.setTextColor(ORANGE);
-        } else {
-            M5.Display.setTextColor(WHITE);
         }
 
-        auto time = (run.time_at_completion - run.start_time) * MILLIS2SECS;
-        M5.Display.printf("%s   %0.2f\r\n", run.name.c_str(), time);
-        M5.Display.setCursor(12, M5.Display.getCursorY());
-    }
-}
-
-void ViewController::displayDragLastRun() {
-    M5.Display.setCursor(12, 20);
-    M5.Display.setTextSize(1.5);
-    M5.Display.setTextColor(WHITE);
-    M5.Display.printf("Last Run:\r\n");
-    M5.Display.setCursor(12, 35);
-
-
-    auto drag_runs = app_state->global_objects.run_controller->GetDragRuns();
-    for (auto & run : drag_runs) {
-        std::visit([](auto& r) -> void {
-            if (!r.is_completed) {return;}
-            if (GetSlope(r.starting_altitude, r.ending_altitude, r.starting_position, r.ending_position) > BAD_SLOPE_PERCENT) {
-                M5.Display.setTextColor(ORANGE);
-            } else {
-                M5.Display.setTextColor(WHITE);
-            }
-            auto time = (r.time_at_completion - r.start_time) * MILLIS2SECS;
-            M5.Display.printf("%s   %0.2f\r\n", r.name.c_str(), time);
-            M5.Display.setCursor(12, M5.Display.getCursorY());
-        }, run);
-    }
-}
-
-void ViewController::displayLastRun() {
-    M5.Display.setCursor(12, 20);
-    M5.Display.setTextSize(1.5);
-    M5.Display.setTextColor(WHITE);
-    M5.Display.printf("Last Run:\r\n");
-    M5.Display.setCursor(12, 35);
-
-    switch (app_state->run_mode) {
-        case DRAG: {
-            displayDragLastRun();
+        case MODIFYING_ROLL_START: {
+            display_buffer.setCursor(15, display_buffer.height() / 2);
+            display_buffer.setTextSize(3);
+            display_buffer.printf("Start: ");
+            int cursor_pos_x_start = display_buffer.getCursorX();
+            display_buffer.printf("%0.0f\n", app_state->settings_roll_params.x);
+            display_buffer.setCursor(cursor_pos_x_start, display_buffer.getCursorY() + 5);
+            display_buffer.printf("km/h");
             break;
         }
-        case ROLL: {
-            displayRollLastRun();
+
+        case MODIFYING_ROLL_END: {
+            display_buffer.setCursor(15, display_buffer.height() / 2);
+            display_buffer.setTextSize(3);
+            display_buffer.printf("End:   ");
+            int cursor_pos_x_end = display_buffer.getCursorX();
+            display_buffer.printf("%0.0f\n", app_state->settings_roll_params.y);
+            display_buffer.setCursor(cursor_pos_x_end, display_buffer.getCursorY() + 5);
+            display_buffer.printf("km/h");
             break;
         }
+
     }
 }
 
 void ViewController::displayBattery() {
-    M5.Display.setCursor(200, 18);
-    M5.Display.setTextSize(1.5);
-    M5.Display.setTextColor(WHITE);
+    display_buffer.setCursor(198, 18);
+    display_buffer.setTextSize(1.5);
+    display_buffer.setTextColor(WHITE);
 
     const int16_t batteryVoltage = M5.Power.getBatteryVoltage();
     int percentage = map(batteryVoltage, 3700, 4200, 0, 100);
     percentage = constrain(percentage, 0, 100);
-    M5.Display.printf("%d%%", percentage);
+    display_buffer.printf("%d%%", percentage);
 }
 
 void ViewController::drawBackStage() {
     switch (app_state->stage) {
         case WELCOME:
-            M5.Display.setColor(255, 0, 0);
+            display_buffer.setColor(255, 0, 0);
             break;
         case VIEW_LAST_RUN:
-            M5.Display.setColor(255, 0, 0);
+            display_buffer.setColor(255, 0, 0);
             break;
         case STAGING:
-            M5.Display.setColor(255, 255, 0);
+            display_buffer.setColor(255, 255, 0);
             break;
         case WAITING_FOR_STAGING:
-            M5.Display.setColor(255, 0, 0);
+            display_buffer.setColor(255, 0, 0);
             break;
         case TIMING:
-            M5.Display.setColor(0, 255, 0);
+            display_buffer.setColor(0, 255, 0);
             break;
         default:
-            M5.Display.setColor(0, 0, 0);
+            display_buffer.setColor(0, 0, 0);
             break;
     }
 
-    M5.Display.drawRect(5, 5, 230, 125);
+    display_buffer.drawRect(5, 5, 230, 125);
 }
 
 void ViewController::displaySpeedometer() {
-    auto current_speed = app_state->gps.current_speed;
+    const double current_speed = app_state->gps.current_speed;
 
-    M5.Display.drawLine(173, 5, 173, 125, GREEN);
+    display_buffer.drawLine(173, 5, 173, 125, GREEN);
 
-    M5.Display.setTextSize(2.5);
-    M5.Display.setTextColor(WHITE);
+    display_buffer.setTextSize(2.5);
+    display_buffer.setTextColor(WHITE);
 
-    M5.Display.setCursor(183, 90);
-    M5.Display.printf("%0.0f\r\n", current_speed);
+    display_buffer.setCursor(183, 90);
+    display_buffer.printf("%0.0f\r\n", current_speed);
 
 
-    M5.Display.setTextSize(1.5);
-    M5.Display.setCursor(185, M5.Display.getCursorY());
-    M5.Display.printf("km/h");
+    display_buffer.setTextSize(1.5);
+    display_buffer.setCursor(185, display_buffer.getCursorY());
+    display_buffer.printf("km/h");
 }
 
 void ViewController::displayGPSWaitTime() {
-    M5.Display.clear();
-    M5.Display.setCursor(40, M5.Display.height() / 2.5);
-    M5.Display.setTextSize(2);
-    M5.Display.setTextColor(WHITE);
-    M5.Display.printf("Waiting for GPS\r\n");
-    M5.Display.setCursor(40, M5.Display.getCursorY()+5);
-    int waitingSeconds = millis() / 1000;
-    M5.Display.printf("%ds\r\n", waitingSeconds);
+    display_buffer.clear();
+    display_buffer.setCursor(40, static_cast<int>(display_buffer.height() / 2.5));
+    display_buffer.setTextSize(2);
+    display_buffer.setTextColor(WHITE);
+    display_buffer.printf("Waiting for GPS\r\n");
+    display_buffer.setCursor(40, display_buffer.getCursorY()+5);
+    const int waitingSeconds = static_cast<int>(millis() / 1000);
+    display_buffer.printf("%ds\r\n", waitingSeconds);
 }
 
 void ViewController::displaysSatelliteCount() {
-    M5.Display.setTextSize(1.5);
-    M5.Display.setTextColor(WHITE);
+    display_buffer.setTextSize(1.5);
+    display_buffer.setTextColor(WHITE);
 
-    uint32_t sat_count = app_state->gps.satellite_count;
+    const uint32_t satellite_count = app_state->gps.satellite_count;
+    const float current_HDOP = app_state->gps.current_HDOP;
+
+    const bool hdop_and_sat = (current_HDOP <= VALID_HDOP_MAX) && (satellite_count >= MIN_GOOD_SATELLITE_COUNT);
+
+    const int satellite_validity_color = hdop_and_sat ? WHITE : ORANGE;
 
     if (app_state->stage == TIMING || app_state->stage == VIEW_LAST_RUN) {
-        M5.Display.setCursor(203, 33);
-        M5.Display.printf("Sat\r\n");
-        M5.Display.setCursor(210, 48);
-        M5.Display.printf("%d", sat_count);
+        display_buffer.setCursor(203, 33);
+        display_buffer.printf("Sat\r\n");
+        display_buffer.setCursor(210, 48);
+        display_buffer.setTextColor(satellite_validity_color);
+        display_buffer.printf("%d", satellite_count);
     } else {
-        M5.Display.setCursor(12, 18);
-        M5.Display.printf("Sats: %d", sat_count);
+        display_buffer.setCursor(12, 18);
+        display_buffer.printf("Sats: ");
+        display_buffer.setTextColor(satellite_validity_color);
+        display_buffer.printf("%d", satellite_count);
     }
 }
 
 void ViewController::displayWelcome() {
-    M5.Display.setCursor(40, M5.Display.height() / 2);
-    M5.Display.setTextSize(4);
-    M5.Display.setTextColor(WHITE);
-    M5.Display.printf("WELCOME");
+    display_buffer.setCursor(40, display_buffer.height() / 2);
+    display_buffer.setTextSize(4);
+    display_buffer.setTextColor(WHITE);
+    display_buffer.printf("WELCOME");
 }
 
 void ViewController::displayWaitingForStaging() {
-    M5.Display.setTextSize(4);
-    M5.Display.setCursor(40, M5.Display.height() / 2);
-    M5.Display.setTextColor(RED);
-    M5.Display.printf("WAITING");
+    display_buffer.setTextSize(4);
+    display_buffer.setCursor(40, display_buffer.height() / 2);
+    display_buffer.setTextColor(RED);
+    display_buffer.printf("WAITING");
 }
 
 void ViewController::displayStaging() {
-    M5.Display.setTextSize(4);
-    M5.Display.setCursor(65, M5.Display.height() / 2);
-    M5.Display.setTextColor(YELLOW);
-    M5.Display.printf("READY");
+    display_buffer.setTextSize(4);
+    display_buffer.setCursor(65, display_buffer.height() / 2);
+    display_buffer.setTextColor(YELLOW);
+    display_buffer.printf("READY");
 }
 
-void ViewController::displayRollTiming() {
-    M5.Display.setCursor(12, 20);
-    M5.Display.setTextSize(1.5);
-    M5.Display.setTextColor(WHITE);
-    M5.Display.printf("Current Run:\r\n");
-    M5.Display.setCursor(12, 35);
+// Current Run
+void ViewController::displayTiming() {
+    display_buffer.setCursor(12, 20);
+    display_buffer.setTextSize(1.5);
+    display_buffer.setTextColor(WHITE);
+    display_buffer.printf("Current Run:\r\n");
+    display_buffer.setCursor(12, 35);
 
-    auto roll_runs = app_state->global_objects.run_controller->GetRollRuns();
+    switch (app_state->run_mode) {
+        case DRAG:
+            displayCurrentDragTiming();
+            break;
+        case ROLL:
+            displayCurrentRollTiming();
+            break;
+        default:
+            break;
+    }
+}
+
+void ViewController::displayCurrentRollTiming() {
+    display_buffer.setTextSize(2.5); // Roll size buff as less roll runs than drags
+    const auto roll_runs = app_state->global_objects.run_controller->GetRollRuns();
 
     for (auto & run : roll_runs) {
         double time;
         if (!run.is_completed) {
             time = (millis() - run.start_time) * MILLIS2SECS;
-            M5.Display.setTextColor(WHITE);
+            display_buffer.setTextColor(WHITE);
         } else {
             time = (run.time_at_completion - run.start_time) * MILLIS2SECS;
-            M5.Display.setTextColor(GREEN);
+            display_buffer.setTextColor(GREEN);
         }
-        M5.Display.printf("%s   %0.2f\r\n", run.name.c_str(), time);
-        M5.Display.setCursor(12, M5.Display.getCursorY());
+        display_buffer.printf("%s:   %0.2fs\r\n", run.name.c_str(), time);
+        display_buffer.setCursor(12, display_buffer.getCursorY());
     }
 }
 
-void ViewController::displayDragTiming() {
-    M5.Display.setCursor(12, 20);
-    M5.Display.setTextSize(1.5);
-    M5.Display.setTextColor(WHITE);
-    M5.Display.printf("Current Run:\r\n");
-    M5.Display.setCursor(12, 35);
-
-
+void ViewController::displayCurrentDragTiming() {
     bool there_is_a_uncompleted_run = false; // Dont display live time for runs following first uncompleted run (With Live Timing)
-    auto drag_runs = app_state->global_objects.run_controller->GetDragRuns();
+
+    const auto drag_runs = app_state->global_objects.run_controller->GetDragRuns();
+
     for (auto & run : drag_runs) {
-        std::visit([&there_is_a_uncompleted_run](auto& r) -> void {
+        std::visit([&there_is_a_uncompleted_run, this](auto& r) -> void {
             double time;
             if (!r.is_completed) {
                 if (there_is_a_uncompleted_run == false) {
@@ -290,28 +258,95 @@ void ViewController::displayDragTiming() {
                 } else {
                     time = 0.0;
                 }
-                M5.Display.setTextColor(WHITE);
+                display_buffer.setTextColor(WHITE);
                 there_is_a_uncompleted_run = true;
             } else {
                 time = (r.time_at_completion - r.start_time) * MILLIS2SECS;
-                M5.Display.setTextColor(GREEN);
+                display_buffer.setTextColor(GREEN);
             }
 
-            M5.Display.printf("%s   %0.2f\r\n", r.name.c_str(), time);
-            M5.Display.setCursor(12, M5.Display.getCursorY());
+            display_buffer.printf("%s:   %0.2fs\r\n", r.name.c_str(), time);
+            display_buffer.setCursor(12, display_buffer.getCursorY());
         }, run);
     }
 }
 
-void ViewController::displayTiming() {
+// Last Runs
+void ViewController::displayLastRun() {
+    display_buffer.setCursor(12, 20);
+    display_buffer.setTextSize(1.5);
+    display_buffer.setTextColor(WHITE);
+    display_buffer.printf("Last Run: ");
+
+    const int status_circle_color = app_state->global_objects.run_controller->IsLastRunValid() ? GREEN : RED;
+    display_buffer.drawCircle(display_buffer.getCursorX() + 10, display_buffer.getCursorY(), 10, status_circle_color);
+
     switch (app_state->run_mode) {
-        case DRAG:
-            displayDragTiming();
+        case DRAG: {
+            displayLastDragRun();
             break;
-        case ROLL:
-            displayRollTiming();
+        }
+        case ROLL: {
+            displayLastRollRun();
             break;
+        }
         default:
             break;
+    }
+
+    // Display Total Distance traveled & slope via completion in super run class
+    display_buffer.setCursor(12, 120);
+    display_buffer.setTextColor(WHITE);
+    display_buffer.setTextSize(1.5);
+
+    const double total_distance_travelled = app_state->global_objects.run_controller->GetTotalRunDistance();
+    display_buffer.printf("DIST: %0.1fm, ", total_distance_travelled);
+
+    const double total_slope_percent = app_state->global_objects.run_controller->GetRunSlopePercent();
+    const int slope_color = (total_slope_percent > MAX_DOWNWARD_SLOPE_PERCENT) ? GREEN : RED;
+    display_buffer.setTextColor(slope_color);
+    display_buffer.printf("SLP: %0.1f%%\r\n", total_slope_percent);
+}
+
+
+void ViewController::displayLastRollRun() {
+    display_buffer.setTextSize(1.75);
+    display_buffer.setCursor(12, 35);
+
+    const auto roll_runs = app_state->global_objects.run_controller->GetRollRuns();
+
+    for (auto & run : roll_runs) {
+        if (!run.is_completed) {continue;}
+        if (GetSlope(run.starting_altitude, run.ending_altitude, run.starting_position, run.ending_position) < MAX_DOWNWARD_SLOPE_PERCENT) {
+            display_buffer.setTextColor(ORANGE);
+        } else {
+            display_buffer.setTextColor(WHITE);
+        }
+
+        auto time = (run.time_at_completion - run.start_time) * MILLIS2SECS;
+        display_buffer.printf("%s:   %0.2fs\r\n", run.name.c_str(), time);
+        display_buffer.setCursor(12, display_buffer.getCursorY());
+    }
+}
+
+void ViewController::displayLastDragRun() {
+    display_buffer.setTextSize(1.75);
+    display_buffer.setCursor(12, 35);
+
+    const auto drag_runs = app_state->global_objects.run_controller->GetDragRuns();
+
+    for (auto & run : drag_runs) {
+        std::visit([this](auto& r) -> void {
+            if (!r.is_completed) {return;}
+            if (GetSlope(r.starting_altitude, r.ending_altitude, r.starting_position, r.ending_position) > MAX_DOWNWARD_SLOPE_PERCENT) {
+                display_buffer.setTextColor(ORANGE);
+            } else {
+                display_buffer.setTextColor(WHITE);
+            }
+
+            auto time = (r.time_at_completion - r.start_time) * MILLIS2SECS;
+            display_buffer.printf("%s:   %0.2fs\r\n", r.name.c_str(), time);
+            display_buffer.setCursor(12, display_buffer.getCursorY()+5);
+        }, run);
     }
 }

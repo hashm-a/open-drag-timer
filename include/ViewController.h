@@ -7,19 +7,23 @@
 
 #include <state.h>
 
+#include <M5Unified.h>
+
 class ViewController {
     AppState * app_state;
+    M5Canvas display_buffer{};
 
 public:
-    ViewController(AppState * app_state_reference);
+    ViewController(AppState * app_state_ptr);
+
     void Draw();
 
+private:
     void displaySettings();
 
-    void displayRollLastRun();
+    void displayLastRollRun();
 
-private:
-    void displayDragLastRun();
+    void displayLastDragRun();
 
     void displayLastRun();
 
@@ -37,11 +41,11 @@ private:
 
     void displayStaging();
 
-    void displayRollTiming();
+    void displayCurrentRollTiming();
 
     void displayWaitingForStaging();
 
-    void displayDragTiming();
+    void displayCurrentDragTiming();
 
     void displayTiming();
 };

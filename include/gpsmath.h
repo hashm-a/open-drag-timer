@@ -9,13 +9,18 @@
 #include "TinyGPSPlus.h"
 #include "types.h"
 
-inline double GetDistanceBetween(Vector2 loc_one, Vector2 loc_two) {
+inline double GetDistanceBetweenInM(Vector2 loc_one, Vector2 loc_two) {
     auto dist_in_meters = TinyGPSPlus::distanceBetween(loc_one.x,loc_one.y,loc_two.x,loc_two.y);
+    return dist_in_meters;
+}
+
+inline double GetDistanceBetweenInKM(Vector2 loc_one, Vector2 loc_two) {
+    auto dist_in_meters = GetDistanceBetweenInM(loc_one, loc_two);
     return dist_in_meters*M2KM; // CONVERT TO KM
 }
 
 inline double GetSlope(int alt_one, int alt_two, Vector2 starting_loc, Vector2 ending_loc) {
-    return (alt_two-alt_one)/(GetDistanceBetween(starting_loc, ending_loc) * KM2M); // Convert back to M for alt calc
+    return (alt_two-alt_one)/GetDistanceBetweenInM(starting_loc, ending_loc); // Use M for alt Calc
 }
 
 #endif //DRAGY_CPP_MATH_H

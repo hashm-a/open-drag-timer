@@ -20,7 +20,12 @@ constexpr int GPS_TX_PIN = 32;
 // RUN
 constexpr float DRAG_LAUNCH_SPEED_THRESHOLD = 0.4f; // KMPH
 constexpr float DRAG_STAGING_SPEED_THRESHOLD = 0.3f; // KMPH
-constexpr float BAD_SLOPE_PERCENT = -0.01;
+
+constexpr float MAX_DOWNWARD_SLOPE = -0.01;
+constexpr float MAX_DOWNWARD_SLOPE_PERCENT = MAX_DOWNWARD_SLOPE * 100;
+
+constexpr float VALID_HDOP_MAX = 2.5;
+constexpr int MIN_GOOD_SATELLITE_COUNT = 7;
 
 // CONVERSIONS
 constexpr float SIXTY_MPH_IN_KMPH = 96.5606;

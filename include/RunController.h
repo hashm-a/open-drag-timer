@@ -20,11 +20,19 @@ class RunController {
 public:
     RunController(AppState * app_state_reference);
 
+    bool DoesLastRunExist();
+
+    bool IsLastRunValid();
+
+    double GetTotalRunDistance();
+
+    double GetRunSlopePercent();
+
     void Update();
 
     void UpdateRuns();
 
-    void ResetAllRuns();
+    // void ResetAllRuns();
 
     void EndCurrentRunPrematurely();
 

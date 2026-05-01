@@ -12,31 +12,33 @@
 
 class RunInterface {
 public:
-    std::string name;
-    unsigned long start_time;
-    int starting_altitude;
+    std::string name{};
+
+    unsigned long start_time{};
+    int starting_altitude{};
     Vector2 starting_position{};
 
-    bool is_completed = false;
-    unsigned long time_at_completion;
-    int ending_altitude;
+    bool is_completed{};
+    unsigned long time_at_completion{};
+    int ending_altitude{};
     Vector2 ending_position{};
 
     virtual ~RunInterface() = default;
     virtual void UpdateRunData(AppState * app_state) = 0;
 
     void ResetRun() {
-        start_time = 0;
-        starting_altitude = 0;
-        starting_position = {0,0};
-        is_completed = false;
-        time_at_completion = 0;
-        ending_altitude = 0;
-        ending_position = {0,0};
+        start_time = {};
+        starting_altitude = {};
+        starting_position = {};
+        is_completed = {};
+        time_at_completion = {};
+        ending_altitude = {};
+        ending_position = {};
     }
 
     void Launch(AppState * app_state) {
-        is_completed = false;
+        ResetRun();
+
         start_time = millis();
         starting_altitude = app_state->gps.altitude;
         starting_position = app_state->gps.location;

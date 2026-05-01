@@ -21,7 +21,20 @@ void InputController::readInput() {
     const m5::Button_Class & LEFT_BUTTON = M5.BtnPWR;
     const m5::Button_Class & RIGHT_BUTTON = M5.BtnB;
 
-    if (!app_state->gps.IsReady()) {return;}
+    // DEBUG
+    if (RIGHT_BUTTON.isHolding() && LEFT_BUTTON.isHolding()) {
+        AudioController::PlayBeep();
+    }
+
+    // Allow Sleeping While Charging
+    if (!app_state->gps.IsReady()) {
+        if (CONFIRM_BUTTON.wasDoubleClicked()) {
+            M5.Power.powerOff();
+        }
+
+        return;
+    }
+
     switch (app_state->stage) {
         case WELCOME: {
             if (RIGHT_BUTTON.wasClicked()) {
@@ -50,7 +63,7 @@ void InputController::readInput() {
         case SETTINGS: {
             switch (app_state->settings_state) {
                 case SELECTING_RUN_TYPE: {
-                    if (RIGHT_BUTTON.wasClicked()) {
+                    if (RIGHT_BUTTON.wasClicked() || LEFT_BUTTON.wasClicked()) { // We can get away with both right & left btn doing the same thing as there are only two options so it wraps around
                         app_state->NextRunMode();
                     } else if (CONFIRM_BUTTON.wasClicked()) {
                         if (app_state->run_mode == ROLL) {
@@ -111,7 +124,6 @@ void InputController::readInput() {
         case TIMING: {
             if (RIGHT_BUTTON.wasClicked()) {
                 app_state->global_objects.run_controller->EndCurrentRunPrematurely(); // Sets stage for us
-                // app_state->SetStage(VIEW_LAST_RUN);
                 break;
             }
             break;

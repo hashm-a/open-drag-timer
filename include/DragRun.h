@@ -40,7 +40,7 @@ public:
 
     void UpdateRunData(AppState * app_state) override {
         if (is_completed) {return;}
-        if (GetDistanceBetween(starting_position, app_state->gps.location) >= target_distance) {
+        if (GetDistanceBetweenInKM(starting_position, app_state->gps.location) >= target_distance) {
             CompleteRunTarget(app_state);
         }
     }

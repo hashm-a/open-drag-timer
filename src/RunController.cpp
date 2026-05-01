@@ -4,7 +4,6 @@
 
 #include <RunController.h>
 #include <state.h>
-#include "RollRun.h"
 
 RunController::RunController(AppState * app_state_reference) : app_state(app_state_reference) {}
 
@@ -22,6 +21,53 @@ void RunController::Update() {
         default:
             break;
     }
+
+    app_state->last_run_exists = DoesLastRunExist();
+}
+
+bool RunController::DoesLastRunExist() {
+    switch (app_state->run_mode) {
+        case DRAG:
+            return drag_run_manager.DoesLastRunExist();
+        case ROLL:
+            return roll_run_manager.DoesLastRunExist();
+        default:
+            return false;
+    }
+
+}
+
+bool RunController::IsLastRunValid() {
+    switch (app_state->run_mode) {
+        case DRAG:
+            return drag_run_manager.IsRunValid(app_state);
+        case ROLL:
+            return roll_run_manager.IsRunValid(app_state);
+        default:
+            return false;
+    }
+}
+
+double RunController::GetTotalRunDistance() {
+    switch (app_state->run_mode) {
+        case DRAG:
+            return drag_run_manager.GetTotalRunDistance(app_state);
+        case ROLL:
+            return roll_run_manager.GetTotalRunDistance(app_state);
+        default:
+            return 0.0;
+    }
+}
+
+double RunController::GetRunSlopePercent() {
+    switch (app_state->run_mode) {
+        case DRAG:
+            return drag_run_manager.GetRunSlopePercent(app_state);
+        case ROLL:
+            return roll_run_manager.GetRunSlopePercent(app_state);
+        default:
+            return 0.0;
+    }
 }
 
 void RunController::UpdateRuns() {
@@ -35,7 +81,6 @@ void RunController::UpdateRuns() {
         default:
             break;
     }
-
 }
 
 void RunController::WaitForStage() {
@@ -66,8 +111,6 @@ void RunController::WaitForStage() {
 }
 
 void RunController::CheckIfLaunched() {
-    if (app_state->stage!=STAGING) {return;}
-
     switch (app_state->run_mode) {
         case DRAG:
             drag_run_manager.CheckForLaunch(app_state);
@@ -75,14 +118,15 @@ void RunController::CheckIfLaunched() {
         case ROLL:
             roll_run_manager.CheckForLaunch(app_state);
             break;
+        default:
+            break;
     }
 }
 
-void RunController::ResetAllRuns() {
-    drag_run_manager.ResetRuns();
-    roll_run_manager.ResetRuns();
-    app_state->last_run_exists = false;
-}
+// void RunController::ResetAllRuns() {
+//     drag_run_manager.ResetRuns();
+//     roll_run_manager.ResetRuns();
+// }
 
 void RunController::EndCurrentRunPrematurely() {
     switch (app_state->run_mode) {
