@@ -6,6 +6,7 @@
 #define DRAGY_CPP_STATE_H
 
 #include "types.h"
+#include "constants.h"
 
 enum Stage {
     GPS_WAIT,
@@ -54,7 +55,7 @@ struct AppState {
     GlobalObjects global_objects;
 
     SettingsState settings_state{SELECTING_RUN_TYPE};
-    Vector2 settings_roll_params{100,200};
+    Vector2 settings_roll_params{DEFAULT_ROLL_START,DEFAULT_ROLL_END};
 
     bool last_run_exists = false;
 

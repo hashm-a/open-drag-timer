@@ -9,13 +9,15 @@
 
 #include "RunInterface.h"
 
+#include "constants.h"
+
 class RollTarget : public RunInterface {
 public:
     // RT specific
     float start_speed;
     float end_speed;
 
-    RollTarget() : start_speed(100), end_speed(200) {
+    RollTarget() : start_speed(DEFAULT_ROLL_START), end_speed(DEFAULT_ROLL_END) {
         name = std::string(std::to_string(static_cast<int>(start_speed)) + "-" + std::to_string(static_cast<int>(end_speed)));
     }
 

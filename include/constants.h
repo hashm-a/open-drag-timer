@@ -27,6 +27,10 @@ constexpr float MAX_DOWNWARD_SLOPE_PERCENT = MAX_DOWNWARD_SLOPE * 100;
 constexpr float VALID_HDOP_MAX = 2.5;
 constexpr int MIN_GOOD_SATELLITE_COUNT = 7;
 
+// DEFAULTS
+constexpr int DEFAULT_ROLL_START = 50;
+constexpr int DEFAULT_ROLL_END = 100;
+
 // CONVERSIONS
 constexpr float SIXTY_MPH_IN_KMPH = 96.5606;
 constexpr float QUARTER_MILE_IN_KM = 0.402336;
