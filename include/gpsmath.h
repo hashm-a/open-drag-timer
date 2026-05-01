@@ -5,8 +5,9 @@
 #ifndef DRAGY_CPP_GPSMATH_H
 #define DRAGY_CPP_GPSMATH_H
 
+#include <TinyGPSPlus.h>
+
 #include "constants.h"
-#include "TinyGPSPlus.h"
 #include "types.h"
 
 inline double GetDistanceBetweenInM(Vector2 loc_one, Vector2 loc_two) {

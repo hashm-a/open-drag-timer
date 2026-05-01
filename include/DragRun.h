@@ -6,6 +6,7 @@
 #define DRAGY_CPP_DRAGRUN_H
 
 #include "RunInterface.h"
+
 #include "gpsmath.h"
 
 class DragSpeedTarget : public RunInterface {

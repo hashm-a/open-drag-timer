@@ -5,9 +5,9 @@
 #ifndef DRAGY_CPP_VIEWCONTROLLER_H
 #define DRAGY_CPP_VIEWCONTROLLER_H
 
-#include <state.h>
-
 #include <M5Unified.h>
+
+#include "state.h"
 
 class ViewController {
     AppState * app_state;

@@ -3,11 +3,12 @@
 //
 
 #include "MasterController.h"
+#include "ViewController.h"
+#include "InputController.h"
+#include "GPSController.h"
+#include "AudioController.h"
 
-#include <constants.h>
-#include <ViewController.h>
-#include <InputController.h>
-#include <GPSController.h>
+#include "constants.h"
 
 MasterController::MasterController(AppState * tracked_app_state) : gps_controller(tracked_app_state, Serial1, GPS_BAUD, GPS_CONFIG, GPS_RX_PIN, GPS_TX_PIN),
                                        input_controller(tracked_app_state),

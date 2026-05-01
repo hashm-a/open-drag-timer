@@ -4,11 +4,13 @@
 
 #ifndef DRAGY_CPP_RUNINTERFACE_H
 #define DRAGY_CPP_RUNINTERFACE_H
-#include "state.h"
-#include "types.h"
+
 #include <Arduino.h>
 
 #include "AudioController.h"
+
+#include "state.h"
+#include "types.h"
 
 class RunInterface {
 public:

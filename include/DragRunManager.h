@@ -6,10 +6,11 @@
 #define DRAGY_CPP_DRAGRUNMANAGER_H
 
 #include "DragRun.h"
+#include "ManagerData.h"
+
 #include "state.h"
 #include "constants.h"
 #include "DragRunPresets.h"
-#include "ManagerData.h"
 
 using DragRunVariants = std::variant<DragSpeedTarget, DragDistanceTarget>;
 

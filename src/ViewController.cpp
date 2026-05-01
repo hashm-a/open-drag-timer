@@ -1,12 +1,12 @@
 //
 // Created by Hashm A on 2026-04-19.
 //
-#include "state.h"
-
-#include "ViewController.h"
-#include "RunController.h"
-
 #include <M5Unified.h>
+
+#include "RunController.h"
+#include "ViewController.h"
+
+#include "state.h"
 
 ViewController::ViewController(AppState * app_state_ptr) : app_state(app_state_ptr) {
     display_buffer.createSprite(M5.Lcd.width(), M5.Lcd.height());

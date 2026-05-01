@@ -4,6 +4,7 @@
 
 #ifndef DRAGY_CPP_DRAGRUNPRESETS_H
 #define DRAGY_CPP_DRAGRUNPRESETS_H
+
 #include <variant>
 
 #include "DragRun.h"

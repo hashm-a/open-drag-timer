@@ -5,8 +5,9 @@
 #ifndef DRAGY_CPP_ROLLRUN_H
 #define DRAGY_CPP_ROLLRUN_H
 
-#include "RunInterface.h"
 #include <string>
+
+#include "RunInterface.h"
 
 class RollTarget : public RunInterface {
 public:

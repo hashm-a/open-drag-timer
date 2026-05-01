@@ -5,9 +5,11 @@
 #ifndef DRAGY_CPP_ROLLRUNMANAGER_H
 #define DRAGY_CPP_ROLLRUNMANAGER_H
 
-#include "RollRun.h"
-#include "state.h"
 #include <vector>
+
+#include "RollRun.h"
+
+#include "state.h"
 
 class RollRunManager : public ManagerData {
     RollTarget target_run{};

@@ -5,12 +5,12 @@
 #ifndef DRAGY_CPP_MASTERCONTROLLER_H
 #define DRAGY_CPP_MASTERCONTROLLER_H
 
-#include <state.h>
-
 #include "GPSController.h"
 #include "InputController.h"
 #include "ViewController.h"
 #include "RunController.h"
+
+#include "state.h"
 
 class MasterController {
     AppState * app_state;

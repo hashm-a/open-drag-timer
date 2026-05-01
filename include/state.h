@@ -5,8 +5,6 @@
 #ifndef DRAGY_CPP_STATE_H
 #define DRAGY_CPP_STATE_H
 
-#include <memory>
-
 #include "types.h"
 
 enum Stage {
@@ -26,11 +24,11 @@ enum RunMode {
 };
 
 struct GPSData {
-    double current_speed = 0;
-    float current_HDOP;
-    uint32_t satellite_count = 0;
+    double current_speed{};
+    float current_HDOP{};
+    uint32_t satellite_count{};
     Vector2 location{};
-    int32_t altitude = 0;
+    int32_t altitude{};
 
     bool IsReady() const {
         return satellite_count>0;
@@ -50,12 +48,12 @@ enum SettingsState {
 };
 
 struct AppState {
-    Stage stage = GPS_WAIT;
+    Stage stage{GPS_WAIT};
     GPSData gps;
-    RunMode run_mode = DRAG;
+    RunMode run_mode{DRAG};
     GlobalObjects global_objects;
 
-    SettingsState settings_state = SELECTING_RUN_TYPE;
+    SettingsState settings_state{SELECTING_RUN_TYPE};
     Vector2 settings_roll_params{100,200};
 
     bool last_run_exists = false;

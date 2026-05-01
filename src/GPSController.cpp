@@ -1,12 +1,11 @@
 //
 // Created by Hashm A on 2026-04-19.
 //
+#include <GPSInterface.h>
 
 #include "GPSController.h"
 
-#include <GPSInterface.h>
-#include <state.h>
-
+#include "state.h"
 
 GPSController::GPSController(AppState * app_state_ptr,
                              HardwareSerial &serialPort,

@@ -5,7 +5,7 @@
 #ifndef DRAGY_CPP_INPUTCONTROLLER_H
 #define DRAGY_CPP_INPUTCONTROLLER_H
 
-#include <state.h>
+#include "state.h"
 
 class InputController {
     AppState * app_state;

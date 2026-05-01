@@ -7,8 +7,8 @@
 
 #include <numeric>
 
-#include "constants.h"
 #include "gpsmath.h"
+#include "constants.h"
 #include "state.h"
 #include "types.h"
 

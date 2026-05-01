@@ -6,7 +6,8 @@
 #define DRAGY_CPP_GPSController_H
 
 #include <GPSInterface.h>
-#include <state.h>
+
+#include "state.h"
 
 class GPSController {
     AppState * app_state;

@@ -1,13 +1,13 @@
 //
 // Created by Hashm A on 2026-04-19.
 //
+#include <M5Unified.h>
 
 #include "InputController.h"
-
-#include <M5Unified.h>
-#include <state.h>
-
 #include "RunController.h"
+#include "AudioController.h"
+
+#include "state.h"
 
 InputController::InputController(AppState * app_state_ptr) : app_state(app_state_ptr) {}
 
