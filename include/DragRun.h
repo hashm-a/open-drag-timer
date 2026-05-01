@@ -14,14 +14,14 @@ public:
     // DS specific
     float target_speed;
 
-    DragSpeedTarget(const char *name, const float target_speed)
+    DragSpeedTarget(const char * name, const float target_speed)
         : target_speed(target_speed) {
         this->name = name;
     }
 
-    void UpdateRunData(AppState * app_state) override {
+    void UpdateRunData(AppState & app_state) override {
         if (is_completed) {return;}
-        if (app_state->gps.current_speed >= target_speed) {
+        if (app_state.gps.current_speed >= target_speed) {
             CompleteRunTarget(app_state);
         }
     }
@@ -39,9 +39,9 @@ public:
         this->name = name;
     }
 
-    void UpdateRunData(AppState * app_state) override {
+    void UpdateRunData(AppState & app_state) override {
         if (is_completed) {return;}
-        if (GetDistanceBetweenInKM(starting_position, app_state->gps.location) >= target_distance) {
+        if (GetDistanceBetweenInKM(starting_position, app_state.gps.location) >= target_distance) {
             CompleteRunTarget(app_state);
         }
     }

@@ -8,10 +8,10 @@
 #include "state.h"
 
 class InputController {
-    AppState * app_state;
+    AppState & app_state;
 
 public:
-    InputController(AppState * app_state_reference);
+    InputController(AppState & tracked_app_state);
     void UpdateInput();
 
 private:

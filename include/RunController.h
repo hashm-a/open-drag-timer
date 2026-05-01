@@ -14,12 +14,12 @@
 #include "state.h"
 
 class RunController {
+    AppState & app_state;
     DragRunManager drag_run_manager;
     RollRunManager roll_run_manager;
-    AppState * app_state;
 
 public:
-    RunController(AppState * app_state_reference);
+    RunController(AppState & tracked_app_state);
 
     bool DoesLastRunExist();
 

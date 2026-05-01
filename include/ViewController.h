@@ -10,11 +10,11 @@
 #include "state.h"
 
 class ViewController {
-    AppState * app_state;
+    AppState & app_state;
     M5Canvas display_buffer{};
 
 public:
-    ViewController(AppState * app_state_ptr);
+    ViewController(AppState & tracked_app_state);
 
     void Draw();
 

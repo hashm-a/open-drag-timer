@@ -26,7 +26,7 @@ public:
     Vector2 ending_position{};
 
     virtual ~RunInterface() = default;
-    virtual void UpdateRunData(AppState * app_state) = 0;
+    virtual void UpdateRunData(AppState & app_state) = 0;
 
     void ResetRun() {
         start_time = {};
@@ -38,19 +38,19 @@ public:
         ending_position = {};
     }
 
-    void Launch(AppState * app_state) {
+    void Launch(AppState & app_state) {
         ResetRun();
 
         start_time = millis();
-        starting_altitude = app_state->gps.altitude;
-        starting_position = app_state->gps.location;
+        starting_altitude = app_state.gps.altitude;
+        starting_position = app_state.gps.location;
     }
 
-    void CompleteRunTarget(AppState * app_state) {
+    void CompleteRunTarget(AppState & app_state) {
         is_completed = true;
         time_at_completion = millis();
-        ending_position = app_state->gps.location;
-        ending_altitude = app_state->gps.altitude;
+        ending_position = app_state.gps.location;
+        ending_altitude = app_state.gps.altitude;
 
         AudioController::PlayBeep();
     }

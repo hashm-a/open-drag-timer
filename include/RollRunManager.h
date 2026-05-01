@@ -30,32 +30,32 @@ public:
         return std::vector<RollTarget>{target_run};
     }
 
-    void LaunchRuns(AppState * app_state) {
+    void LaunchRuns(AppState & app_state) {
         target_run.Launch(app_state);
 
         LaunchSelf(app_state);
     }
 
-    void CheckForLaunch(AppState * app_state) {
-        if (app_state->gps.current_speed >= target_run.start_speed) {
+    void CheckForLaunch(AppState & app_state) {
+        if (app_state.gps.current_speed >= target_run.start_speed) {
             LaunchRuns(app_state);
-            app_state->SetStage(TIMING);
+            app_state.SetStage(TIMING);
         }
     }
 
-    void EndAllRunsPrematurely(AppState * app_state) {
+    void EndAllRunsPrematurely(AppState & app_state) {
         target_run.EndRunTargetPremature();
 
         EndSelf(app_state);
 
         // if (DoesLastRunExist()) {
-            app_state->SetStage(VIEW_LAST_RUN);
+            app_state.SetStage(VIEW_LAST_RUN);
         // } else {
-            // app_state->SetStage(WELCOME);
+            // app_state.SetStage(WELCOME);
         // }
     }
 
-    void UpdateRuns(AppState * app_state) {
+    void UpdateRuns(AppState & app_state) {
         target_run.UpdateRunData(app_state);
 
         UpdateSelf(app_state);

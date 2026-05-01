@@ -28,9 +28,9 @@ public:
         name = std::string(std::to_string(static_cast<int>(start_speed)) + "-" + std::to_string(static_cast<int>(end_speed)));
     }
 
-    void UpdateRunData(AppState * app_state) override {
+    void UpdateRunData(AppState & app_state) override {
         if (is_completed) {return;}
-        if (app_state->gps.current_speed >= end_speed) {
+        if (app_state.gps.current_speed >= end_speed) {
             CompleteRunTarget(app_state);
         }
     }

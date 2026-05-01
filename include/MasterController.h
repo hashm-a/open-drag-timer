@@ -13,7 +13,7 @@
 #include "state.h"
 
 class MasterController {
-    AppState * app_state;
+    AppState & app_state;
 
     GPSController gps_controller;
     InputController input_controller;
@@ -21,7 +21,7 @@ class MasterController {
     RunController run_controller;
 
 public:
-    MasterController(AppState * tracked_app_state);
+    MasterController(AppState & tracked_app_state);
     void Update();
 };
 

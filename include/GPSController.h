@@ -10,11 +10,11 @@
 #include "state.h"
 
 class GPSController {
-    AppState * app_state;
+    AppState & app_state;
     GPSInterface gps_interface;
 
 public:
-    GPSController(AppState * app_state_ptr, HardwareSerial& serialPort, long baudRate, uint32_t config, int rxPin, int txPin);
+    GPSController(AppState & tracked_app_state, HardwareSerial& serialPort, long baudRate, uint32_t config, int rxPin, int txPin);
 
     void Update();
 

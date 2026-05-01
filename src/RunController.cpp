@@ -6,10 +6,10 @@
 
 #include "state.h"
 
-RunController::RunController(AppState * app_state_reference) : app_state(app_state_reference) {}
+RunController::RunController(AppState & tracked_app_state) : app_state(tracked_app_state), drag_run_manager(), roll_run_manager() {}
 
 void RunController::Update() {
-    switch (app_state->stage) {
+    switch (app_state.stage) {
         case WAITING_FOR_STAGING:
             WaitForStage();
             break;
@@ -23,11 +23,11 @@ void RunController::Update() {
             break;
     }
 
-    app_state->last_run_exists = DoesLastRunExist();
+    app_state.last_run_exists = DoesLastRunExist();
 }
 
 bool RunController::DoesLastRunExist() {
-    switch (app_state->run_mode) {
+    switch (app_state.run_mode) {
         case DRAG:
             return drag_run_manager.DoesLastRunExist();
         case ROLL:
@@ -39,7 +39,7 @@ bool RunController::DoesLastRunExist() {
 }
 
 bool RunController::IsLastRunValid() {
-    switch (app_state->run_mode) {
+    switch (app_state.run_mode) {
         case DRAG:
             return drag_run_manager.IsRunValid(app_state);
         case ROLL:
@@ -50,7 +50,7 @@ bool RunController::IsLastRunValid() {
 }
 
 double RunController::GetTotalRunDistance() {
-    switch (app_state->run_mode) {
+    switch (app_state.run_mode) {
         case DRAG:
             return drag_run_manager.GetTotalRunDistance(app_state);
         case ROLL:
@@ -61,7 +61,7 @@ double RunController::GetTotalRunDistance() {
 }
 
 double RunController::GetRunSlopePercent() {
-    switch (app_state->run_mode) {
+    switch (app_state.run_mode) {
         case DRAG:
             return drag_run_manager.GetRunSlopePercent(app_state);
         case ROLL:
@@ -72,7 +72,7 @@ double RunController::GetRunSlopePercent() {
 }
 
 void RunController::UpdateRuns() {
-    switch (app_state->run_mode) {
+    switch (app_state.run_mode) {
         case DRAG:
             drag_run_manager.UpdateRuns(app_state);
             break;
@@ -85,10 +85,10 @@ void RunController::UpdateRuns() {
 }
 
 void RunController::WaitForStage() {
-    switch (app_state->run_mode) {
+    switch (app_state.run_mode) {
         case DRAG: {
-            if (app_state->gps.current_speed <= DRAG_STAGING_SPEED_THRESHOLD) {
-                app_state->SetStage(STAGING);
+            if (app_state.gps.current_speed <= DRAG_STAGING_SPEED_THRESHOLD) {
+                app_state.SetStage(STAGING);
                 break;
             }
             break;
@@ -100,8 +100,8 @@ void RunController::WaitForStage() {
                 if (roll.start_speed < min_roll_speed) {min_roll_speed = roll.start_speed;}
             }
 
-            if (app_state->gps.current_speed < min_roll_speed) {
-                app_state->SetStage(STAGING);
+            if (app_state.gps.current_speed < min_roll_speed) {
+                app_state.SetStage(STAGING);
                 break;
             }
             break;
@@ -112,7 +112,7 @@ void RunController::WaitForStage() {
 }
 
 void RunController::CheckIfLaunched() {
-    switch (app_state->run_mode) {
+    switch (app_state.run_mode) {
         case DRAG:
             drag_run_manager.CheckForLaunch(app_state);
             break;
@@ -130,7 +130,7 @@ void RunController::CheckIfLaunched() {
 // }
 
 void RunController::EndCurrentRunPrematurely() {
-    switch (app_state->run_mode) {
+    switch (app_state.run_mode) {
         case DRAG:
             drag_run_manager.EndAllRunsPrematurely(app_state);
             break;

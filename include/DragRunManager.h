@@ -45,7 +45,7 @@ public:
         return std::vector(run_targets.begin(),run_targets.end());
     }
 
-    void LaunchRuns(AppState * app_state) {
+    void LaunchRuns(AppState & app_state) {
         for (auto & t: run_targets) {
             std::visit([&app_state](auto& run) -> void {
                 run.Launch(app_state);
@@ -55,14 +55,14 @@ public:
         LaunchSelf(app_state);
     }
 
-    void CheckForLaunch(AppState * app_state) {
-        if (app_state->gps.current_speed >= DRAG_LAUNCH_SPEED_THRESHOLD) {
+    void CheckForLaunch(AppState & app_state) {
+        if (app_state.gps.current_speed >= DRAG_LAUNCH_SPEED_THRESHOLD) {
             LaunchRuns(app_state);
-            app_state->SetStage(TIMING);
+            app_state.SetStage(TIMING);
         }
     }
 
-    void EndAllRunsPrematurely(AppState * app_state) {
+    void EndAllRunsPrematurely(AppState & app_state) {
         for (auto & t: run_targets) {
             std::visit([](auto& run) -> void {
                 run.EndRunTargetPremature();
@@ -72,13 +72,13 @@ public:
         EndSelf(app_state);
 
         // if (DoesLastRunExist()) {
-            app_state->SetStage(VIEW_LAST_RUN);
+            app_state.SetStage(VIEW_LAST_RUN);
         // } else {
-            // app_state->SetStage(WELCOME);
+            // app_state.SetStage(WELCOME);
         // }
     }
 
-    void UpdateRuns(AppState * app_state) {
+    void UpdateRuns(AppState & app_state) {
         for (auto & t: run_targets) {
             std::visit([&app_state](auto& run) -> void {
                 run.UpdateRunData(app_state);

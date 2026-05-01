@@ -33,24 +33,24 @@ private:
     bool calculations_are_completed{};
 
 protected:
-    void LaunchSelf(const AppState * app_state) {
+    void LaunchSelf(const AppState & app_state) {
         ResetSelf();
 
-        starting_position = app_state->gps.location;
-        starting_altitude = app_state->gps.altitude;
+        starting_position = app_state.gps.location;
+        starting_altitude = app_state.gps.altitude;
     }
     
-    void UpdateSelf(const AppState * app_state) {
-        hdop_readings.push_back(app_state->gps.current_HDOP);
+    void UpdateSelf(const AppState & app_state) {
+        hdop_readings.push_back(app_state.gps.current_HDOP);
     }
 
-    void EndSelf(const AppState * app_state) {
+    void EndSelf(const AppState & app_state) {
         if (!DoesLastRunExist()) {
             return;
         }
 
-        ending_position = app_state->gps.location;
-        ending_altitude = app_state->gps.altitude;
+        ending_position = app_state.gps.location;
+        ending_altitude = app_state.gps.altitude;
         calculations_are_completed = true;
 
         // Calculations
@@ -77,7 +77,7 @@ public:
     // IMP by real controller
     virtual bool DoesLastRunExist() = 0;
 
-    bool IsRunValid(const AppState * app_state) {
+    bool IsRunValid(const AppState & app_state) {
         if (!calculations_are_completed) {
             EndSelf(app_state);
         }
@@ -98,14 +98,14 @@ public:
         return true;
     }
 
-    double GetTotalRunDistance(const AppState * app_state) {
+    double GetTotalRunDistance(const AppState & app_state) {
         if (!calculations_are_completed) {
             EndSelf(app_state);
         }
         return total_run_distance_meter;
     }
 
-    double GetRunSlopePercent(const AppState * app_state) {
+    double GetRunSlopePercent(const AppState & app_state) {
         if (!calculations_are_completed) {
             EndSelf(app_state);
         }
