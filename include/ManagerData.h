@@ -15,20 +15,20 @@
 class ManagerData {
 private:
     Vector2 starting_position{};
-    int starting_altitude{}; // in meters
+    double starting_altitude{}; // in meters
 
     Vector2 ending_position{};
-    int ending_altitude{}; // in meters
+    double ending_altitude{}; // in meters
 
-    std::vector<float> hdop_readings{};
-    std::vector<int> satellite_readings{};
+    std::vector<double> hdop_readings{};
+    std::vector<uint32_t> satellite_readings{};
 
     // Calculated Only Once
     double total_run_distance_meter{};
-    double total_run_slope_percent{};
+    double total_run_slope{};
 
-    float avg_num_of_satellites{};
-    float avg_hdop_reading{};
+    int avg_num_of_satellites{};
+    double avg_hdop_reading{};
 
     bool calculations_are_completed{};
 
@@ -42,6 +42,7 @@ protected:
     
     void UpdateSelf(const AppState & app_state) {
         hdop_readings.push_back(app_state.gps.current_HDOP);
+        satellite_readings.push_back(app_state.gps.satellite_count);
     }
 
     void EndSelf(const AppState & app_state) {
@@ -55,10 +56,24 @@ protected:
 
         // Calculations
         total_run_distance_meter = GetDistanceBetweenInM(starting_position, ending_position);
-        total_run_slope_percent = ((ending_altitude - starting_altitude) / total_run_distance_meter) * 100; // %
 
-        avg_hdop_reading = std::accumulate(hdop_readings.begin(), hdop_readings.end(), 0LL) / std::size(hdop_readings);
-        avg_num_of_satellites = std::accumulate(satellite_readings.begin(), satellite_readings.end(), 0LL) / std::size(satellite_readings);
+        if (total_run_distance_meter == 0) {
+            total_run_slope = 0.0;
+        } else {
+            total_run_slope = GetSlope(starting_altitude, ending_altitude, starting_position, ending_position);
+        }
+
+        if (hdop_readings.empty()) {
+            avg_hdop_reading = 80.8;
+        } else {
+            avg_hdop_reading = std::accumulate(hdop_readings.begin(), hdop_readings.end(), 0.0) / std::size(hdop_readings);
+        }
+
+        if (satellite_readings.empty()) {
+            avg_num_of_satellites = 0;
+        } else {
+            avg_num_of_satellites = static_cast<int>(std::accumulate(satellite_readings.begin(), satellite_readings.end(), 0LL) / std::size(satellite_readings));
+        }
     }
 
     void ResetSelf() {
@@ -69,7 +84,7 @@ protected:
         ending_altitude = {};
 
         total_run_distance_meter = {};
-        total_run_slope_percent = {};
+        total_run_slope = {};
     }
 
 public:
@@ -82,14 +97,13 @@ public:
             EndSelf(app_state);
         }
 
-        if (total_run_slope_percent < MAX_DOWNWARD_SLOPE_PERCENT) {
+        if (!IsSlopeValid(total_run_slope)) {
             return false;
         }
 
-        // Off for debug
-        // if (avg_num_of_satellites <= MIN_GOOD_SATELLITE_COUNT) {
-        //     return false;
-        // }
+        if (avg_num_of_satellites < MIN_GOOD_SATELLITE_COUNT) {
+            return false;
+        }
 
         if (avg_hdop_reading > VALID_HDOP_MAX) {
             return false;
@@ -109,7 +123,14 @@ public:
         if (!calculations_are_completed) {
             EndSelf(app_state);
         }
-        return total_run_slope_percent;
+        return total_run_slope * 100.0;
+    }
+
+    double GetAverageHDOP(const AppState & app_state) {
+        if (!calculations_are_completed) {
+            EndSelf(app_state);
+        }
+        return avg_hdop_reading;
     }
 };
 

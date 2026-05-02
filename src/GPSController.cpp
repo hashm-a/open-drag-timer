@@ -64,7 +64,7 @@ void GPSController::updateLocation() {
 
 void GPSController::updateAltitude() {
     if (gps_interface.altitude.isValid()) {
-        app_state.gps.altitude = gps_interface.altitude.value();
+        app_state.gps.altitude = gps_interface.altitude.meters();
     }
 }
 

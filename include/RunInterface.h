@@ -17,12 +17,12 @@ public:
     std::string name{};
 
     unsigned long start_time{};
-    int starting_altitude{};
+    double starting_altitude{};
     Vector2 starting_position{};
 
     bool is_completed{};
     unsigned long time_at_completion{};
-    int ending_altitude{};
+    double ending_altitude{};
     Vector2 ending_position{};
 
     virtual ~RunInterface() = default;
@@ -38,7 +38,7 @@ public:
         ending_position = {};
     }
 
-    void Launch(AppState & app_state) {
+    void Launch(const AppState & app_state) {
         ResetRun();
 
         start_time = millis();
@@ -46,7 +46,7 @@ public:
         starting_position = app_state.gps.location;
     }
 
-    void CompleteRunTarget(AppState & app_state) {
+    void CompleteRunTarget(const AppState & app_state) {
         is_completed = true;
         time_at_completion = millis();
         ending_position = app_state.gps.location;

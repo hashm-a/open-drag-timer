@@ -5,7 +5,6 @@
 
 #include "InputController.h"
 #include "RunController.h"
-#include "AudioController.h"
 
 #include "state.h"
 
@@ -22,9 +21,11 @@ void InputController::readInput() {
     const m5::Button_Class & RIGHT_BUTTON = M5.BtnB;
 
     // DEBUG
-    if (RIGHT_BUTTON.isHolding() && LEFT_BUTTON.isHolding()) {
-        AudioController::PlayBeep();
+    if (CONFIRM_BUTTON.wasPressed()) {
+        app_state.gps.current_speed = 60;
+        return;
     }
+    // END DEBUG
 
     // Allow Sleeping While Charging
     if (!app_state.gps.IsReady()) {

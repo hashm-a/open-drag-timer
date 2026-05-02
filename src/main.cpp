@@ -4,7 +4,6 @@
 #include "MasterController.h"
 
 #include "state.h"
-#include "constants.h"
 
 AppState app_state{};
 MasterController *  controller = nullptr;
@@ -17,5 +16,4 @@ void setup() {
 
 void loop() {
     controller->Update();
-    delay(FRAME_DELAY);
 }

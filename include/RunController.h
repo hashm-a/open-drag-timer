@@ -27,13 +27,13 @@ public:
 
     double GetTotalRunDistance();
 
+    double GetAverageHDOP();
+
     double GetRunSlopePercent();
 
     void Update();
 
     void UpdateRuns();
-
-    // void ResetAllRuns();
 
     void EndCurrentRunPrematurely();
 

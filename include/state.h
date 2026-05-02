@@ -26,10 +26,10 @@ enum RunMode {
 
 struct GPSData {
     double current_speed{};
-    float current_HDOP{};
+    double current_HDOP{};
     uint32_t satellite_count{};
     Vector2 location{};
-    int32_t altitude{};
+    double altitude{};
 
     bool IsReady() const {
         return satellite_count>0;

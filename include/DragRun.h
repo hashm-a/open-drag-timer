@@ -12,7 +12,7 @@
 class DragSpeedTarget : public RunInterface {
 public:
     // DS specific
-    float target_speed;
+    double target_speed;
 
     DragSpeedTarget(const char * name, const float target_speed)
         : target_speed(target_speed) {
@@ -31,10 +31,10 @@ public:
 class DragDistanceTarget : public RunInterface {
 public:
     // DD specific
-    float target_distance;
+    double target_distance;
 
     // When launch set start pos
-    DragDistanceTarget(const char * name, const float target_distance)
+    DragDistanceTarget(const char * name, const double target_distance)
     : target_distance(target_distance) {
         this->name = name;
     }

@@ -60,6 +60,17 @@ double RunController::GetTotalRunDistance() {
     }
 }
 
+double RunController::GetAverageHDOP() {
+    switch (app_state.run_mode) {
+        case DRAG:
+            return drag_run_manager.GetAverageHDOP(app_state);
+        case ROLL:
+            return roll_run_manager.GetAverageHDOP(app_state);
+        default:
+            return 99.9;
+    }
+}
+
 double RunController::GetRunSlopePercent() {
     switch (app_state.run_mode) {
         case DRAG:
@@ -123,11 +134,6 @@ void RunController::CheckIfLaunched() {
             break;
     }
 }
-
-// void RunController::ResetAllRuns() {
-//     drag_run_manager.ResetRuns();
-//     roll_run_manager.ResetRuns();
-// }
 
 void RunController::EndCurrentRunPrematurely() {
     switch (app_state.run_mode) {

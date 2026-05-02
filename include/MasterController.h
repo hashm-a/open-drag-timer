@@ -20,6 +20,8 @@ class MasterController {
     ViewController view_controller;
     RunController run_controller;
 
+    unsigned long previousFrameTime{};
+
 public:
     MasterController(AppState & tracked_app_state);
     void Update();

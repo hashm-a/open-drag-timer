@@ -8,9 +8,9 @@
 #include "DragRun.h"
 #include "ManagerData.h"
 
+#include "DragRunPresets.h"
 #include "state.h"
 #include "constants.h"
-#include "DragRunPresets.h"
 
 using DragRunVariants = std::variant<DragSpeedTarget, DragDistanceTarget>;
 

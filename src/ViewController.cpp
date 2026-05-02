@@ -165,11 +165,15 @@ void ViewController::displaysSatelliteCount() {
     display_buffer.setTextColor(WHITE);
 
     const uint32_t satellite_count = app_state.gps.satellite_count;
-    const float current_HDOP = app_state.gps.current_HDOP;
+    const double current_HDOP = app_state.gps.current_HDOP;
 
-    const bool hdop_and_sat = (current_HDOP <= VALID_HDOP_MAX) && (satellite_count >= MIN_GOOD_SATELLITE_COUNT);
+    int satellite_validity_color = WHITE;
 
-    const int satellite_validity_color = hdop_and_sat ? WHITE : ORANGE;
+    if (current_HDOP > VALID_HDOP_MAX) {
+        satellite_validity_color = BROWN;
+    } else if (satellite_count < MIN_GOOD_SATELLITE_COUNT) {
+        satellite_validity_color = ORANGE;
+    }
 
     if (app_state.stage == TIMING || app_state.stage == VIEW_LAST_RUN) {
         display_buffer.setCursor(203, 33);
@@ -212,7 +216,7 @@ void ViewController::displayTiming() {
     display_buffer.setTextSize(1.5);
     display_buffer.setTextColor(WHITE);
     display_buffer.printf("Current Run:\r\n");
-    display_buffer.setCursor(12, 35);
+    display_buffer.setCursor(12, display_buffer.getCursorY());
 
     switch (app_state.run_mode) {
         case DRAG:
@@ -227,7 +231,8 @@ void ViewController::displayTiming() {
 }
 
 void ViewController::displayCurrentRollTiming() {
-    display_buffer.setTextSize(2.5); // Roll size buff as less roll runs than drags
+    display_buffer.setTextSize(1.75); // Roll size buff as less roll runs than drags
+
     const auto roll_runs = app_state.global_objects.run_controller->GetRollRuns();
 
     for (auto & run : roll_runs) {
@@ -239,7 +244,7 @@ void ViewController::displayCurrentRollTiming() {
             time = (run.time_at_completion - run.start_time) * MILLIS2SECS;
             display_buffer.setTextColor(GREEN);
         }
-        display_buffer.printf("%s:   %0.2fs\r\n", run.name.c_str(), time);
+        display_buffer.printf("%s: %0.2fs\r\n", run.name.c_str(), time);
         display_buffer.setCursor(12, display_buffer.getCursorY());
     }
 }
@@ -279,7 +284,11 @@ void ViewController::displayLastRun() {
     display_buffer.printf("Last Run: ");
 
     const int status_circle_color = app_state.global_objects.run_controller->IsLastRunValid() ? GREEN : RED;
-    display_buffer.drawCircle(display_buffer.getCursorX() + 10, display_buffer.getCursorY(), 10, status_circle_color);
+    display_buffer.fillCircle(display_buffer.getCursorX() + 3, display_buffer.getCursorY()-2, 5, status_circle_color);
+
+    display_buffer.printf("\n\n");
+    display_buffer.setCursor(12, display_buffer.getCursorY());
+    display_buffer.setTextSize(1.75);
 
     switch (app_state.run_mode) {
         case DRAG: {
@@ -297,54 +306,54 @@ void ViewController::displayLastRun() {
     // Display Total Distance traveled & slope via completion in super run class
     display_buffer.setCursor(12, 120);
     display_buffer.setTextColor(WHITE);
-    display_buffer.setTextSize(1.5);
+    display_buffer.setTextSize(1);
 
     const double total_distance_travelled = app_state.global_objects.run_controller->GetTotalRunDistance();
     display_buffer.printf("DIST: %0.1fm, ", total_distance_travelled);
 
     const double total_slope_percent = app_state.global_objects.run_controller->GetRunSlopePercent();
-    const int slope_color = (total_slope_percent > MAX_DOWNWARD_SLOPE_PERCENT) ? GREEN : RED;
+    const int slope_color = IsSlopePercentValid(total_slope_percent) ? GREEN : RED;
     display_buffer.setTextColor(slope_color);
-    display_buffer.printf("SLP: %0.1f%%\r\n", total_slope_percent);
+    display_buffer.printf("SLP: %0.1f%%, ", total_slope_percent);
+
+    const double avg_hdop_quality = app_state.global_objects.run_controller->GetAverageHDOP();
+    const int hdop_color = (avg_hdop_quality < VALID_HDOP_MAX) ? GREEN : RED;
+    display_buffer.setTextColor(hdop_color);
+    display_buffer.printf("Q: %0.1f\r\n", avg_hdop_quality);
 }
 
-
 void ViewController::displayLastRollRun() {
-    display_buffer.setTextSize(1.75);
-    display_buffer.setCursor(12, 35);
-
     const auto roll_runs = app_state.global_objects.run_controller->GetRollRuns();
 
     for (auto & run : roll_runs) {
         if (!run.is_completed) {continue;}
-        if (GetSlope(run.starting_altitude, run.ending_altitude, run.starting_position, run.ending_position) < MAX_DOWNWARD_SLOPE_PERCENT) {
-            display_buffer.setTextColor(ORANGE);
-        } else {
+
+        if (GetAndValidateSlope(run.starting_altitude, run.ending_altitude, run.starting_position, run.ending_position)) {
             display_buffer.setTextColor(WHITE);
+        } else {
+            display_buffer.setTextColor(ORANGE);
         }
 
-        auto time = (run.time_at_completion - run.start_time) * MILLIS2SECS;
+        const auto time = (run.time_at_completion - run.start_time) * MILLIS2SECS;
         display_buffer.printf("%s:   %0.2fs\r\n", run.name.c_str(), time);
         display_buffer.setCursor(12, display_buffer.getCursorY());
     }
 }
 
 void ViewController::displayLastDragRun() {
-    display_buffer.setTextSize(1.75);
-    display_buffer.setCursor(12, 35);
-
     const auto drag_runs = app_state.global_objects.run_controller->GetDragRuns();
 
     for (auto & run : drag_runs) {
         std::visit([this](auto& r) -> void {
             if (!r.is_completed) {return;}
-            if (GetSlope(r.starting_altitude, r.ending_altitude, r.starting_position, r.ending_position) > MAX_DOWNWARD_SLOPE_PERCENT) {
-                display_buffer.setTextColor(ORANGE);
-            } else {
+
+            if (GetAndValidateSlope(r.starting_altitude, r.ending_altitude, r.starting_position, r.ending_position)) {
                 display_buffer.setTextColor(WHITE);
+            } else {
+                display_buffer.setTextColor(ORANGE);
             }
 
-            auto time = (r.time_at_completion - r.start_time) * MILLIS2SECS;
+            const auto time = (r.time_at_completion - r.start_time) * MILLIS2SECS;
             display_buffer.printf("%s:   %0.2fs\r\n", r.name.c_str(), time);
             display_buffer.setCursor(12, display_buffer.getCursorY()+5);
         }, run);
