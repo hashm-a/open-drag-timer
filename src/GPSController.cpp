@@ -20,7 +20,8 @@ GPSController::GPSController(AppState & tracked_app_state,
     delay(500);
     gps_interface.setSystemBootMode(BOOT_COLD_START);
     delay(500);
-    gps_interface.setSatelliteMode(SATELLITE_MODE_GPSGLONASSGALILEO);
+    // gps_interface.setSatelliteMode(SATELLITE_MODE_GPSGLONASSGALILEO);
+    gps_interface.setSatelliteMode(SATELLITE_MODE_ALL); // EXPARIMENTAL
     delay(500);
     gps_interface.increaseRefreshRate();
     delay(500);

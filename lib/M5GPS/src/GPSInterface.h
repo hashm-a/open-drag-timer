@@ -18,7 +18,8 @@ typedef enum {
     SATELLITE_MODE_QZSS,     // QZSS mode
     SATELLITE_MODE_GPSGLONASS,    // GPSGLONASS mode
     SATELLITE_MODE_GPSGALILEO,         // GPSGALILEO mode
-    SATELLITE_MODE_GPSGLONASSGALILEO,       // All mode
+    SATELLITE_MODE_GPSGLONASSGALILEO,       // GPS + GLONASS + GALILEO
+    SATELLITE_MODE_ALL, // GPS + GLONASS + GALILEO + BDS
 } satellite_mode_t;
 
 typedef enum {
@@ -81,7 +82,7 @@ public:
     {
         return findCharacter("ANTENNA");
     }
-    
+
     String getSatelliteMode()
     {
         write("$PCAS06,2*19\r\n");
@@ -127,6 +128,9 @@ public:
                 break;
             case SATELLITE_MODE_GPSGALILEO:
                 write("$PCAS04,9*10\r\n");
+                break;
+            case SATELLITE_MODE_ALL:
+                write("$PCAS04,1F*5E\r\n");
                 break;
             default:
                 break;
@@ -181,18 +185,18 @@ public:
                 break;
         }
     }
-    
+
     void reduceLatency() {
         write("$PCAS03,1,0,0,0,1,0,0,0,0,0,,,0,0*02\r\n");
     }
 
-    void disableFilters() {
+    void disableFilters() { // Disables acceleration smoothing (with automotive mode engine)
         write("BA CE 2C 00 06 07 03 00 00 00 03 33 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 32 33 06 07\r\n");
     }
 
     void increaseRefreshRate()
     {
-        write("$PCAS02,100*1E\r\n");
+        write("$PCAS02,100*1E\r\n"); // 10hz
     }
 
     void saveConfig()
@@ -203,7 +207,7 @@ public:
     void StandbyMode(){
         write("$PCAS12,65535*1E\r\n");
     }
-     
+
 private:
     HardwareSerial& _serial;
     long _baudRate;

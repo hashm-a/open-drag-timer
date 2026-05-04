@@ -97,13 +97,13 @@ void ViewController::displaySettings() {
 }
 
 void ViewController::displayBattery() {
-    display_buffer.setCursor(198, 18);
+    display_buffer.setCursor(202, 18);
     display_buffer.setTextSize(1.5);
     display_buffer.setTextColor(WHITE);
 
     const int16_t batteryVoltage = M5.Power.getBatteryVoltage();
     int percentage = map(batteryVoltage, 3700, 4200, 0, 100);
-    percentage = constrain(percentage, 0, 100);
+    percentage = constrain(percentage, 0, 99);
     display_buffer.printf("%d%%", percentage);
 }
 
@@ -232,6 +232,8 @@ void ViewController::displayTiming() {
 
 void ViewController::displayCurrentRollTiming() {
     display_buffer.setTextSize(1.75); // Roll size buff as less roll runs than drags
+    display_buffer.printf("\n"); // Extra spacing due to text size increase
+    display_buffer.setCursor(12, display_buffer.getCursorY());
 
     const auto roll_runs = app_state.global_objects.run_controller->GetRollRuns();
 
@@ -312,12 +314,12 @@ void ViewController::displayLastRun() {
     display_buffer.printf("DIST: %0.1fm, ", total_distance_travelled);
 
     const double total_slope_percent = app_state.global_objects.run_controller->GetRunSlopePercent();
-    const int slope_color = IsSlopePercentValid(total_slope_percent) ? GREEN : RED;
+    const int slope_color = IsSlopePercentValid(total_slope_percent) ? WHITE : RED;
     display_buffer.setTextColor(slope_color);
     display_buffer.printf("SLP: %0.1f%%, ", total_slope_percent);
 
     const double avg_hdop_quality = app_state.global_objects.run_controller->GetAverageHDOP();
-    const int hdop_color = (avg_hdop_quality < VALID_HDOP_MAX) ? GREEN : RED;
+    const int hdop_color = (avg_hdop_quality < VALID_HDOP_MAX) ? WHITE : RED;
     display_buffer.setTextColor(hdop_color);
     display_buffer.printf("Q: %0.1f\r\n", avg_hdop_quality);
 }

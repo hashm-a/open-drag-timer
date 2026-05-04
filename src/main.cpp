@@ -6,7 +6,7 @@
 #include "state.h"
 
 AppState app_state{};
-MasterController *  controller = nullptr;
+MasterController * controller = nullptr;
 
 void setup() {
     M5.begin(m5::M5Unified::config());

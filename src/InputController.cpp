@@ -20,13 +20,6 @@ void InputController::readInput() {
     const m5::Button_Class & LEFT_BUTTON = M5.BtnPWR;
     const m5::Button_Class & RIGHT_BUTTON = M5.BtnB;
 
-    // DEBUG
-    if (CONFIRM_BUTTON.wasPressed()) {
-        app_state.gps.current_speed = 60;
-        return;
-    }
-    // END DEBUG
-
     // Allow Sleeping While Charging
     if (!app_state.gps.IsReady()) {
         if (CONFIRM_BUTTON.wasDoubleClicked()) {

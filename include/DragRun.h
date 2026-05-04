@@ -27,7 +27,6 @@ public:
     }
 };
 
-// ISSUE
 class DragDistanceTarget : public RunInterface {
 public:
     // DD specific

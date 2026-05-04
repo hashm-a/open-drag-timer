@@ -25,8 +25,8 @@ void MasterController::Update() {
         previousFrameTime = millis();
 
         gps_controller.Update();
-        input_controller.UpdateInput(); // MOVE INPUT BELOW RUN (GPS RUN INPUT VIEW)
         run_controller.Update();
+        input_controller.UpdateInput();
         view_controller.Draw();
 
         if (app_state.gps.IsReady() && app_state.stage == GPS_WAIT) {
