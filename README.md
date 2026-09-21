@@ -13,3 +13,5 @@ A low cost drag/roll racing automotive timer built on the M5Stack ecosystem
 [Dragy](https://www.godragy.com/) - $250 USD 
 
 [RaceLogic Performance Box](https://www.vboxmotorsport.co.uk/en/performance-box-touch) - $920 USD
+
+### AI was not used in the creation of this project
